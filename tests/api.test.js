@@ -444,8 +444,32 @@ describe('Tasks', () => {
     assert.equal(bobSees.body.pagination.totalRecords, 0);
   });
 
+  test('sorting by title in ascending and descending order', async () => {
+    const asc = await api('GET', '/api/tasks?limit=100&sortBy=title&order=asc', { token: state.aliceToken });
+    assert.equal(asc.status, 200);
+    const titles = asc.body.data.tasks.map((t) => t.title);
+    assert.equal(titles.length, 13);
+    assert.deepEqual(titles, [...titles].sort());
+
+    const desc = await api('GET', '/api/tasks?limit=100&sortBy=title&order=desc', { token: state.aliceToken });
+    assert.deepEqual(desc.body.data.tasks.map((t) => t.title), [...titles].reverse());
+
+    const byDefault = await api('GET', '/api/tasks?limit=100', { token: state.aliceToken });
+    const created = byDefault.body.data.tasks.map((t) => t.createdAt);
+    assert.deepEqual(created, [...created].sort().reverse());
+  });
+
   test('invalid query parameters are rejected with 400', async () => {
-    const queries = ['page=0', 'limit=1000', 'page=abc', 'status=done', 'priority=urgent', 'projectId=abc'];
+    const queries = [
+      'page=0',
+      'limit=1000',
+      'page=abc',
+      'status=done',
+      'priority=urgent',
+      'projectId=abc',
+      'sortBy=priority',
+      'order=up',
+    ];
     for (const query of queries) {
       const res = await api('GET', `/api/tasks?${query}`, { token: state.aliceToken });
       assert.equal(res.status, 400, query);

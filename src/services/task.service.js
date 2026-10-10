@@ -8,15 +8,17 @@ export const createTask = async (userId, data) => {
   return Task.create({ ...data, ownerId: userId });
 };
 
-export const listTasks = async (userId, { page, limit, status, priority, projectId }) => {
+export const listTasks = async (userId, { page, limit, status, priority, projectId, sortBy, order }) => {
   const filter = { ownerId: userId };
   if (status) filter.status = status;
   if (priority) filter.priority = priority;
   if (projectId) filter.projectId = projectId;
 
+  const direction = order === 'asc' ? 1 : -1;
+
   const [tasks, totalRecords] = await Promise.all([
     Task.find(filter)
-      .sort({ createdAt: -1, _id: -1 })
+      .sort({ [sortBy]: direction, _id: direction })
       .skip((page - 1) * limit)
       .limit(limit),
     Task.countDocuments(filter),

@@ -42,10 +42,14 @@ export const updateTaskSchema = Joi.object({
     'object.min': 'Provide at least one of: title, description, status, priority, dueDate, projectId',
   });
 
+const TASK_SORT_FIELDS = ['createdAt', 'updatedAt', 'dueDate', 'title'];
+
 export const listTasksQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).default(1),
   limit: Joi.number().integer().min(1).max(100).default(10),
   status,
   priority,
   projectId,
+  sortBy: Joi.string().valid(...TASK_SORT_FIELDS).default('createdAt'),
+  order: Joi.string().valid('asc', 'desc').default('desc'),
 });

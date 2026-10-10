@@ -225,7 +225,7 @@ Authorization: Bearer <token>
 | PUT | `/api/projects/:id` | yes | Update a project |
 | DELETE | `/api/projects/:id` | yes | Delete a project and its tasks |
 | POST | `/api/tasks` | yes | Create a task in one of my projects |
-| GET | `/api/tasks` | yes | List my tasks (pagination and filters) |
+| GET | `/api/tasks` | yes | List my tasks (pagination, filters and sorting) |
 | GET | `/api/tasks/:id` | yes | Get one task |
 | PUT | `/api/tasks/:id` | yes | Update a task |
 | DELETE | `/api/tasks/:id` | yes | Delete a task |
@@ -512,7 +512,7 @@ curl -X POST http://localhost:4000/api/tasks \
 
 #### GET /api/tasks
 
-Returns the logged-in user's tasks, newest first.
+Returns the logged-in user's tasks, newest first unless `sortBy` and `order` say otherwise.
 
 | Query parameter | Rules | Default |
 | --- | --- | --- |
@@ -521,6 +521,8 @@ Returns the logged-in user's tasks, newest first.
 | `status` | `todo`, `in_progress`, `completed` | none |
 | `priority` | `low`, `medium`, `high` | none |
 | `projectId` | positive integer | none |
+| `sortBy` | `createdAt`, `updatedAt`, `dueDate`, `title` | `createdAt` |
+| `order` | `asc`, `desc` | `desc` |
 
 ```bash
 curl "http://localhost:4000/api/tasks?page=1&limit=10&status=todo&priority=high" \
@@ -561,7 +563,9 @@ curl "http://localhost:4000/api/tasks?page=1&limit=10&status=todo&priority=high"
 }
 ```
 
-`400` for invalid query values such as `page=0`, `limit=1000` or `status=done`.
+Sorted example: `GET /api/tasks?sortBy=dueDate&order=asc`.
+
+`400` for invalid query values such as `page=0`, `limit=1000`, `status=done` or `sortBy=priority`.
 
 #### GET /api/tasks/:id
 
