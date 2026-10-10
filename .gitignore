@@ -1,0 +1,14 @@
+# dependencies
+node_modules/
+
+# environment files (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# logs and OS/editor noise
+*.log
+.DS_Store
+.vscode/
+.idea/
+coverage/
