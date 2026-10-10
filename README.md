@@ -21,6 +21,7 @@ A RESTful API where users register, log in, manage their projects and tasks, fil
 10. [Database design](#database-design)
 11. [Testing](#testing)
 12. [Security notes](#security-notes)
+13. [Future improvements](#future-improvements)
 
 ## Tech stack
 
@@ -736,3 +737,13 @@ The tests start the app on a random port and call it over HTTP, using the databa
 - Login returns the same message for an unknown email and a wrong password.
 - `helmet` sets security headers and JSON bodies are limited to 10 kB.
 - Secrets live only in `.env`, which is ignored by Git.
+
+## Future improvements
+
+- **Rate limiting** on `register` and `login` to slow down brute-force attempts.
+- **Refresh tokens** with short-lived access tokens, so a leaked token expires quickly without forcing frequent logins.
+- **Cursor-based pagination** for tasks. `skip`/`limit` is simple and fine for normal use, but gets slower on very deep pages.
+- **Reliable cross-database delete.** Deleting a project removes its tasks in a second step. A background job or outbox table would retry the task cleanup if MongoDB is unavailable at that moment.
+- **Soft deletes** for projects and tasks, so accidental deletions can be restored.
+- **OpenAPI (Swagger) documentation** generated from the route definitions.
+- **CI pipeline** that runs the test suite on every push, and a Dockerfile for the API itself.
