@@ -5,12 +5,14 @@ const name = Joi.string().trim().min(1).max(150);
 const description = Joi.string().trim().max(2000).allow('', null);
 const status = Joi.string().valid(...PROJECT_STATUSES);
 
+const INVALID_ID_MESSAGE = 'id must be a valid project id';
+
 export const projectIdParamSchema = Joi.object({
   id: Joi.number().integer().positive().required().messages({
-    'number.base': 'id must be a valid project id',
-    'number.integer': 'id must be a valid project id',
-    'number.positive': 'id must be a valid project id',
-    'number.unsafe': 'id must be a valid project id',
+    'number.base': INVALID_ID_MESSAGE,
+    'number.integer': INVALID_ID_MESSAGE,
+    'number.positive': INVALID_ID_MESSAGE,
+    'number.unsafe': INVALID_ID_MESSAGE,
   }),
 });
 
