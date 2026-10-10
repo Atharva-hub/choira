@@ -1,7 +1,3 @@
--- MySQL schema for the Project & Task Management API.
--- Run with:  npm run db:init
--- or:        mysql -u <user> -p task_manager < database/schema.sql
-
 CREATE TABLE IF NOT EXISTS users (
   id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
   name          VARCHAR(100) NOT NULL,

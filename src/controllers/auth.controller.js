@@ -1,9 +1,6 @@
 import * as authService from '../services/auth.service.js';
 import { sendSuccess } from '../utils/apiResponse.js';
 
-// Controllers stay thin: read the validated input, call a service,
-// send the response. Business rules live in the services.
-
 export const register = async (req, res) => {
   const data = await authService.register(req.valid.body);
   sendSuccess(res, { statusCode: 201, message: 'User registered successfully', data });
@@ -15,13 +12,10 @@ export const login = async (req, res) => {
 };
 
 export const getMe = async (req, res) => {
-  // req.user was loaded by the authenticate middleware.
   sendSuccess(res, { message: 'Profile fetched successfully', data: { user: req.user } });
 };
 
 export const updateProfile = async (req, res) => {
-  // The id always comes from the token, never from the request body,
-  // so a user can only ever update their own profile.
   const user = await authService.updateProfile(req.user.id, req.valid.body);
   sendSuccess(res, { message: 'Profile updated successfully', data: { user } });
 };

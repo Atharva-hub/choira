@@ -5,15 +5,11 @@ export const PROJECT_STATUSES = ['active', 'completed', 'archived'];
 const COLUMNS =
   'id, user_id AS userId, name, description, status, created_at AS createdAt, updated_at AS updatedAt';
 
-// API field name -> database column. Doubles as a whitelist for updates.
 const UPDATABLE_COLUMNS = {
   name: 'name',
   description: 'description',
   status: 'status',
 };
-
-// Every read/write below is scoped by user_id, so a user can never
-// touch a project that belongs to someone else.
 
 export const create = async ({ userId, name, description = null, status = 'active' }) => {
   const [result] = await pool.execute(
@@ -63,13 +59,11 @@ export const updateByIdAndUser = async (id, userId, fields) => {
   );
 };
 
-// Returns true when a row was actually deleted.
 export const deleteByIdAndUser = async (id, userId) => {
   const [result] = await pool.execute('DELETE FROM projects WHERE id = ? AND user_id = ?', [id, userId]);
   return result.affectedRows > 0;
 };
 
-// One query gives all three project numbers for the dashboard.
 export const getStatsByUser = async (userId) => {
   const [rows] = await pool.execute(
     `SELECT

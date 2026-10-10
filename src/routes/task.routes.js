@@ -11,7 +11,6 @@ import {
 
 const router = Router();
 
-// Every task route requires a logged-in user.
 router.use(authenticate);
 
 router

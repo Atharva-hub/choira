@@ -1,5 +1,3 @@
-// Creates the MySQL database (if needed) and the tables in database/schema.sql.
-// Usage: npm run db:init
 import { readFile } from 'node:fs/promises';
 import mysql from 'mysql2/promise';
 import env from '../src/config/env.js';
@@ -9,13 +7,12 @@ const schemaPath = new URL('../database/schema.sql', import.meta.url);
 const run = async () => {
   const schema = await readFile(schemaPath, 'utf8');
 
-  // Connect WITHOUT selecting a database, because it may not exist yet.
   const connection = await mysql.createConnection({
     host: env.mysql.host,
     port: env.mysql.port,
     user: env.mysql.user,
     password: env.mysql.password,
-    multipleStatements: true, // schema.sql contains several statements
+    multipleStatements: true,
   });
 
   try {

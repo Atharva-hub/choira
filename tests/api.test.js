@@ -1,6 +1,3 @@
-// End-to-end tests: start the real app on a random port and call it over HTTP.
-// Requires MySQL + MongoDB running and a .env file (same as `npm start`).
-// Run with: npm test
 import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
 
@@ -14,11 +11,11 @@ const { default: Task } = await import('../src/models/task.model.js');
 const run = Date.now();
 const alice = { name: 'Alice Test', email: `alice.${run}@example.com`, password: 'Password123' };
 const bob = { name: 'Bob Test', email: `bob.${run}@example.com`, password: 'Password123' };
-const FAKE_TASK_ID = '64b7f0f0f0f0f0f0f0f0f0f0'; // valid format, does not exist
+const FAKE_TASK_ID = '64b7f0f0f0f0f0f0f0f0f0f0';
 
 let server;
 let baseUrl;
-const state = {}; // tokens and ids shared between tests
+const state = {};
 
 const api = async (method, path, { token, body, rawBody } = {}) => {
   const headers = {};
@@ -42,12 +39,11 @@ before(async () => {
 });
 
 after(async () => {
-  // Remove everything this run created.
   const [users] = await pool.query('SELECT id FROM users WHERE email LIKE ?', [`%.${run}@example.com`]);
   const ids = users.map((u) => u.id);
   if (ids.length > 0) {
     await Task.deleteMany({ ownerId: { $in: ids } });
-    await pool.query('DELETE FROM users WHERE id IN (?)', [ids]); // projects cascade
+    await pool.query('DELETE FROM users WHERE id IN (?)', [ids]);
   }
   await new Promise((resolve) => server.close(resolve));
   await Promise.allSettled([pool.end(), disconnectMongo()]);
@@ -358,7 +354,6 @@ describe('Tasks', () => {
   });
 
   test('pagination returns the right slices and totals', async () => {
-    // Alice already has 1 task. Add 12 more => 13 total.
     for (let i = 1; i <= 12; i += 1) {
       const res = await api('POST', '/api/tasks', {
         token: state.aliceToken,
@@ -389,7 +384,6 @@ describe('Tasks', () => {
     assert.equal(last.body.pagination.hasNextPage, false);
     assert.equal(last.body.pagination.hasPrevPage, true);
 
-    // No task appears on two pages.
     const second = await api('GET', '/api/tasks?page=2&limit=5', { token: state.aliceToken });
     const ids = [...first.body.data.tasks, ...second.body.data.tasks, ...last.body.data.tasks].map((t) => t.id);
     assert.equal(new Set(ids).size, 13);
@@ -410,7 +404,7 @@ describe('Tasks', () => {
     assert.ok(byStatus.body.data.tasks.every((t) => t.status === 'completed'));
 
     const byPriority = await api('GET', '/api/tasks?priority=high&limit=100', { token: state.aliceToken });
-    assert.equal(byPriority.body.pagination.totalRecords, 5); // tasks 3,6,9,12 + the updated one
+    assert.equal(byPriority.body.pagination.totalRecords, 5);
     assert.ok(byPriority.body.data.tasks.every((t) => t.priority === 'high'));
 
     const byProject = await api('GET', `/api/tasks?projectId=${state.secondProjectId}&limit=100`, {
@@ -422,7 +416,7 @@ describe('Tasks', () => {
     const combined = await api('GET', '/api/tasks?page=1&limit=10&status=todo&priority=high', {
       token: state.aliceToken,
     });
-    assert.equal(combined.body.pagination.totalRecords, 3); // tasks 6, 9, 12
+    assert.equal(combined.body.pagination.totalRecords, 3);
     assert.ok(combined.body.data.tasks.every((t) => t.status === 'todo' && t.priority === 'high'));
 
     const bobSees = await api('GET', '/api/tasks', { token: state.bobToken });

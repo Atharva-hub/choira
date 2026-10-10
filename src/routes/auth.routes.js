@@ -6,11 +6,9 @@ import { loginSchema, registerSchema, updateProfileSchema } from '../validators/
 
 const router = Router();
 
-// Public
 router.post('/register', validate(registerSchema), authController.register);
 router.post('/login', validate(loginSchema), authController.login);
 
-// Protected (need a valid token)
 router.get('/me', authenticate, authController.getMe);
 router.put('/profile', authenticate, validate(updateProfileSchema), authController.updateProfile);
 

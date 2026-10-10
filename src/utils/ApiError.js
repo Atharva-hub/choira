@@ -1,7 +1,3 @@
-// An error we throw on purpose (bad input, not found, unauthorized...).
-// It carries the HTTP status code, so the central error handler knows
-// exactly what to send back. Anything that is NOT an ApiError is treated
-// as an unexpected failure and becomes a generic 500.
 export default class ApiError extends Error {
   constructor(statusCode, message, errors = []) {
     super(message);

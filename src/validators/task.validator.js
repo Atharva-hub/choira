@@ -13,7 +13,6 @@ const projectId = Joi.number().integer().positive().messages({
   'number.unsafe': 'projectId must be a valid project id',
 });
 
-// A MongoDB ObjectId is exactly 24 hexadecimal characters.
 export const taskIdParamSchema = Joi.object({
   id: Joi.string().hex().length(24).required().messages({
     'string.hex': 'id must be a valid task id',

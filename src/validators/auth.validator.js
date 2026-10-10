@@ -2,7 +2,6 @@ import Joi from 'joi';
 
 const name = Joi.string().trim().min(2).max(100);
 const email = Joi.string().trim().lowercase().email().max(255);
-// bcrypt only looks at the first 72 bytes of a password, so we cap the length.
 const password = Joi.string()
   .min(8)
   .max(72)
@@ -29,8 +28,8 @@ export const updateProfileSchema = Joi.object({
   password,
   currentPassword: Joi.string(),
 })
-  .or('name', 'email', 'password') // at least one thing to update
-  .with('password', 'currentPassword') // new password needs the current one
+  .or('name', 'email', 'password')
+  .with('password', 'currentPassword')
   .messages({
     'object.missing': 'Provide at least one of: name, email, password',
     'object.with': 'currentPassword is required to set a new password',

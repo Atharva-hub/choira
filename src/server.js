@@ -4,14 +4,12 @@ import { connectMongo, disconnectMongo } from './config/mongo.js';
 import pool, { connectMySQL } from './config/mysql.js';
 
 const start = async () => {
-  // Connect to both databases BEFORE accepting requests.
   await Promise.all([connectMySQL(), connectMongo()]);
 
   const server = app.listen(env.port, () => {
     console.log(`Server running on http://localhost:${env.port} (${env.nodeEnv})`);
   });
 
-  // Graceful shutdown: finish in-flight requests, then close connections.
   const shutdown = (signal) => {
     console.log(`\n${signal} received, shutting down...`);
     server.close(async () => {

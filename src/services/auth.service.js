@@ -4,7 +4,6 @@ import ApiError from '../utils/ApiError.js';
 import { signToken } from '../utils/jwt.js';
 import * as UserModel from '../models/user.model.js';
 
-// Never let the password hash leave the service layer.
 const toPublicUser = ({ passwordHash, ...user }) => user;
 
 export const register = async ({ name, email, password }) => {
@@ -19,8 +18,6 @@ export const register = async ({ name, email, password }) => {
   try {
     userId = await UserModel.create({ name, email, passwordHash });
   } catch (err) {
-    // Two requests with the same email can pass the check above at the
-    // same moment. The UNIQUE index in MySQL is the real guarantee.
     if (err.code === 'ER_DUP_ENTRY') {
       throw ApiError.conflict('An account with this email already exists');
     }
@@ -34,8 +31,6 @@ export const register = async ({ name, email, password }) => {
 export const login = async ({ email, password }) => {
   const user = await UserModel.findByEmailWithPassword(email);
 
-  // Same message for "no such email" and "wrong password", so an
-  // attacker cannot use this endpoint to find out which emails exist.
   const passwordMatches = user ? await bcrypt.compare(password, user.passwordHash) : false;
   if (!passwordMatches) {
     throw ApiError.unauthorized('Invalid email or password');

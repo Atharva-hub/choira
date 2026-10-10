@@ -1,8 +1,5 @@
 import 'dotenv/config';
 
-// Every variable the app cannot run without. We fail fast at startup
-// instead of discovering a missing secret in the middle of a request.
-// (MYSQL_PASSWORD is not listed because a local MySQL may have an empty one.)
 const required = ['MYSQL_HOST', 'MYSQL_USER', 'MYSQL_DATABASE', 'MONGO_URI', 'JWT_SECRET'];
 
 const missing = required.filter((key) => !process.env[key]);
