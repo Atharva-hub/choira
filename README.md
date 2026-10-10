@@ -469,6 +469,7 @@ Task fields:
 | `status` | optional, one of `todo`, `in_progress`, `completed` (default `todo`) |
 | `priority` | optional, one of `low`, `medium`, `high` (default `medium`) |
 | `dueDate` | optional, ISO date such as `2026-11-01`, or `null` |
+| `completedAt` | read-only; set automatically when `status` becomes `completed`, cleared when the task is reopened |
 | `projectId` | required on create; must be a project owned by the logged-in user |
 
 #### POST /api/tasks
@@ -493,6 +494,7 @@ curl -X POST http://localhost:4000/api/tasks \
       "status": "todo",
       "priority": "high",
       "dueDate": "2026-11-01T00:00:00.000Z",
+      "completedAt": null,
       "projectId": 1,
       "ownerId": 1,
       "createdAt": "2026-10-10T08:26:06.347Z",
@@ -540,6 +542,7 @@ curl "http://localhost:4000/api/tasks?page=1&limit=10&status=todo&priority=high"
         "status": "todo",
         "priority": "high",
         "dueDate": "2026-11-01T00:00:00.000Z",
+        "completedAt": null,
         "projectId": 1,
         "ownerId": 1,
         "createdAt": "2026-10-10T08:26:06.347Z",
@@ -658,7 +661,7 @@ Index `(user_id, status)` supports listing a user's projects and the dashboard c
 
 ### MongoDB
 
-`tasks` collection (Mongoose model `Task`): `title`, `description`, `status`, `priority`, `dueDate`, `projectId`, `ownerId`, `createdAt`, `updatedAt`.
+`tasks` collection (Mongoose model `Task`): `title`, `description`, `status`, `priority`, `dueDate`, `completedAt`, `projectId`, `ownerId`, `createdAt`, `updatedAt`.
 
 Indexes: `{ ownerId, createdAt }`, `{ ownerId, projectId }`, `{ ownerId, status, priority }`.
 

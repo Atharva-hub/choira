@@ -353,6 +353,27 @@ describe('Tasks', () => {
     assert.equal(unknown.status, 404);
   });
 
+  test('completedAt is set when a task is completed and cleared when it is reopened', async () => {
+    const path = `/api/tasks/${state.taskId}`;
+
+    const before = await api('GET', path, { token: state.aliceToken });
+    assert.equal(before.body.data.task.completedAt, null);
+
+    const completed = await api('PUT', path, { token: state.aliceToken, body: { status: 'completed' } });
+    assert.equal(completed.status, 200);
+    assert.ok(completed.body.data.task.completedAt);
+
+    const ignored = await api('PUT', path, {
+      token: state.aliceToken,
+      body: { title: 'Design homepage', completedAt: '2000-01-01' },
+    });
+    assert.equal(ignored.body.data.task.completedAt, completed.body.data.task.completedAt);
+
+    const reopened = await api('PUT', path, { token: state.aliceToken, body: { status: 'in_progress' } });
+    assert.equal(reopened.body.data.task.status, 'in_progress');
+    assert.equal(reopened.body.data.task.completedAt, null);
+  });
+
   test('pagination returns the right slices and totals', async () => {
     for (let i = 1; i <= 12; i += 1) {
       const res = await api('POST', '/api/tasks', {

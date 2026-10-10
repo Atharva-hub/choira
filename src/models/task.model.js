@@ -10,6 +10,7 @@ const taskSchema = new mongoose.Schema(
     status: { type: String, enum: TASK_STATUSES, default: 'todo' },
     priority: { type: String, enum: TASK_PRIORITIES, default: 'medium' },
     dueDate: { type: Date, default: null },
+    completedAt: { type: Date, default: null },
 
     projectId: { type: Number, required: true },
     ownerId: { type: Number, required: true },
@@ -22,6 +23,12 @@ const taskSchema = new mongoose.Schema(
     },
   },
 );
+
+taskSchema.pre('save', function setCompletedAt() {
+  if (this.isNew || this.isModified('status')) {
+    this.completedAt = this.status === 'completed' ? new Date() : null;
+  }
+});
 
 taskSchema.index({ ownerId: 1, createdAt: -1 });
 taskSchema.index({ ownerId: 1, projectId: 1 });
