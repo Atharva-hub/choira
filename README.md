@@ -90,7 +90,7 @@ npm run db:init
 npm run dev
 ```
 
-The API is then available at `http://localhost:4000`. `GET /health` confirms it is running.
+The API is then available at `http://localhost:4000`. `GET /health` confirms it is running and that both databases are reachable.
 
 ## MySQL configuration
 
@@ -200,6 +200,7 @@ Error:
 | `404` | Resource or route not found (also returned for resources owned by another user) |
 | `409` | Duplicate email |
 | `500` | Unexpected server or database error (details are logged, not returned) |
+| `503` | Health check found a database unreachable |
 
 ## API reference
 
@@ -215,6 +216,7 @@ Authorization: Bearer <token>
 
 | Method | Endpoint | Auth | Description |
 | --- | --- | --- | --- |
+| GET | `/health` | no | API and database status |
 | POST | `/api/auth/register` | no | Create an account |
 | POST | `/api/auth/login` | no | Log in and receive a token |
 | GET | `/api/auth/me` | yes | Get the logged-in user's profile |
@@ -230,6 +232,37 @@ Authorization: Bearer <token>
 | PUT | `/api/tasks/:id` | yes | Update a task |
 | DELETE | `/api/tasks/:id` | yes | Delete a task |
 | GET | `/api/dashboard` | yes | Statistics for the logged-in user |
+
+### Health
+
+#### GET /health
+
+```bash
+curl http://localhost:4000/health
+```
+
+`200 OK`
+
+```json
+{
+  "success": true,
+  "message": "API is running",
+  "data": {
+    "databases": { "mysql": "up", "mongodb": "up" },
+    "uptimeSeconds": 42
+  }
+}
+```
+
+`503 Service Unavailable` when a database cannot be reached:
+
+```json
+{
+  "success": false,
+  "message": "Service unavailable",
+  "errors": [ { "field": "mysql", "message": "mysql is not reachable" } ]
+}
+```
 
 ### Authentication
 

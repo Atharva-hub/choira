@@ -530,6 +530,13 @@ describe('Deleting', () => {
 });
 
 describe('General', () => {
+  test('health check reports both databases as up', async () => {
+    const res = await api('GET', '/health');
+    assert.equal(res.status, 200);
+    assert.deepEqual(res.body.data.databases, { mysql: 'up', mongodb: 'up' });
+    assert.equal(typeof res.body.data.uptimeSeconds, 'number');
+  });
+
   test('unknown routes return a JSON 404', async () => {
     const res = await api('GET', '/api/does-not-exist');
     assert.equal(res.status, 404);
